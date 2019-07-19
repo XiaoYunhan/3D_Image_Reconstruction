@@ -82,32 +82,49 @@ def deformation():
 	generate_z = fitting_func(target_vertices_x, target_vertices_y)
 	result_vertices = np.dstack([target_vertices_x, target_vertices_y, generate_z])
 
-	# mesh deformation on mask.obj
-	#load_obj(dir+"mask.obj")
-	#cmds.select("mask_Mesh")
-	cmds.select("target_Mesh")
+	# mesh deformation on target.obj
 
 	selection = OpenMaya.MSelectionList()
 	OpenMaya.MGlobal.getActiveSelectionList( selection )
 	iterSel = OpenMaya.MItSelectionList(selection, OpenMaya.MFn.kMesh)
 
-	while not iterSel.isDone():
+	#while not iterSel.isDone():
 		# get dagPath
-		dagPath = OpenMaya.MDagPath()
-		iterSel.getDagPath( dagPath )
+		#dagPath = OpenMaya.MDagPath()
+		#iterSel.getDagPath( dagPath )
 		# create empty point array
-		inMeshMPointArray = OpenMaya.MPointArray()
+		#inMeshMPointArray = OpenMaya.MPointArray()
 		# create function set and get points in world space
-		currentInMeshMFnMesh = OpenMaya.MFnMesh(dagPath)
-		currentInMeshMFnMesh.getPoints(inMeshMPointArray, OpenMaya.MSpace.kWorld)
+		#currentInMeshMFnMesh = OpenMaya.MFnMesh(dagPath)
+		#currentInMeshMFnMesh.getPoints(inMeshMPointArray, OpenMaya.MSpace.kWorld)
 		# put each point to a list
-		pointList = []
-		for i in range( inMeshMPointArray.length() ) :
-			pointList.append( [inMeshMPointArray[i][0], inMeshMPointArray[i][1], inMeshMPointArray[i][2]] )
-	
+		#pointList = []
+		#for i in range( inMeshMPointArray.length() ) :
+			#pointList.append( [inMeshMPointArray[i][0], inMeshMPointArray[i][1], inMeshMPointArray[i][2]] )
 
-	# OpenMaya.MFnMesh.setPoints(mPoints, space=OpenMaya.MSpace.kWorld)
 
+	selection = None		
+	cmds.select("target_Mesh")
+	selection_list = OpenMaya.MSelectionList()
+	selection = cmds.duplicate(selection[0])[0]
+	cmds.select(selection)
+	selection_list.add(selection)
+	dag_path = selection_list.getDagPath(0)
+
+	mfn_set = OpenMaya.MFnMesh(dag_path)
+	verts = mfn_set.getPoints(space=OpenMaya.MSpace.kObject)
+	new_points = OpenMaya.MPointArray()
+
+	i = 0
+
+	for v in verts:
+		v.x = v[i][0]
+		v.y = v[i][1]
+		v.z = v[i][2]
+		new_points.append(v)
+		i = i+1
+
+	mfn_set.setPoints(new_points, space=OpenMaya.MSpace.kWorld)
 
 	export_obj("mask_Mesh", dir+"output.obj")
 	sys.exit()
