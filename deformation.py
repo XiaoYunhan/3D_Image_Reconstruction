@@ -118,9 +118,9 @@ def deformation():
 	i = 0
 
 	for v in verts:
-		v.x = v[i][0]
-		v.y = v[i][1]
-		v.z = v[i][2]
+		v.x = result_vertices[i][0]
+		v.y = result_vertices[i][1]
+		v.z = result_vertices[i][2]
 		new_points.append(v)
 		i = i+1
 
