@@ -1,137 +1,100 @@
 import numpy as np
-import maya.cmds as cmds
-import maya.api.OpenMaya as OpenMaya
-import rbf
-import sys
+import pymesh as pm
+from scipy import linalg
+from scipy.special import xlogy
+from scipy.spatial.distance import cdist, pdist, squareform
+#import rbf
 
-dir  = "C:/Users/PC/Desktop/June26/RBF/"
+class Rbf(object):
 
-def reset_scene():
-	cmds.file(f=True, new=True)
+	def multiquadric(self, r):
+        
+		return np.sqrt((1.0/self.epsilon*r)**2 + 1)
 
-def load_obj(file_name):
+	def thin_plate(self, r):
+        
+		return xlogy(r**2, r)
 
-	cmds.file(file_name, i=True, type="OBJ")
+	def __init__(self, input_x, input_y, input_z):
+        
+		self.x = input_x
+		self.y = input_y
+		self.z = input_z
+		self.flatten = np.asarray([np.asarray(self.x).flatten(),
+							       np.asarray(self.y).flatten()]) # shape (2, num_of_input)
+		self.num_of_input = self.flatten.shape[-1]
+		# print(self.flatten.shape)
+		self.last = np.asarray(self.z).flatten() # shape (num_of_input,)
+		# print(self.last.shape)
 
-def export_obj(obj, file_name):
-    cmds.select(obj)
-    cmds.file(file_name, force=True, options=
-    	"groups=0;ptgroups=0;materials=0;smoothing=1;normals=1", 
-    	typ="OBJexport", pr=True, es=True)
+		self.A = self.thin_plate(squareform(pdist(self.flatten.T, 'euclidean')))
+		
+		self.B = linalg.solve(self.A, self.last) # least squares
 
-def deformation():
-	#reset_scene()
+	def __call__(self, input_x, input_y):
+		
+		sp = input_x.shape
+		xa = np.asarray([input_x.flatten(), input_y.flatten()])
+		# print(xa.shape)
+		r = cdist(xa.T, self.flatten.T, 'euclidean')
+		return np.dot(self.thin_plate(r), self.B).reshape(sp)
 
-	#vertexcount = self.newpoints.length()
-	#inMeshFn.getVertices(mesh_counts, mesh_connect)
-	#polycount = inMeshFn.numPolygons()
-	#tempMeshData = OpenMaya.MFnMeshData()
-	#tempObject = OpenMaya.MObject()
-	#tempObject = tempMeshData.create()
-	#newObject = OpenMaya.MObject()
-	#MeshFs = OpenMaya.MFnMesh()
+target_mesh = pm.load_mesh("target.obj")
+source_mesh = pm.load_mesh("source.obj")
 
-	# store vertex coordinations of source object in np.ndarray
-	load_obj(dir+"source.obj")
+source_vertices = source_mesh.vertices
+#print(source_vertices.shape)
+# source_faces = source_mesh.faces
 
-	cmds.select("Mesh")
-	vtxSourcePosition = []
-	vtxSourceIndexList = cmds.getAttr("Mesh.vrts", multiIndices = True)
-	for i in vtxSourceIndexList:
-		curPointPosition = cmds.xform("Mesh.pnts["+str(i)+"]", query=True,
-			translation=True, worldSpace=True)
-		vtxSourcePosition.append(curPointPosition)
-	# print type(vtxWorldPosition)
-	source_vertices = np.array(vtxSourcePosition)
+target_vertices = target_mesh.vertices
+# faces index of target_mesh are unchanged
+# target_faces = target_mesh.faces
 
+# print(source_vertices)
+# print(source_faces)
 
-	# store vertex coordinations of target object in ndarray
-	load_obj(dir+"target.obj")
+source_vertices_x = source_vertices[:,0]
+source_vertices_y = source_vertices[:,1]
+source_vertices_z = source_vertices[:,2]
 
-	cmds.select("target_Mesh")
-	vtxTargetPosition = []
-	vtxTargetIndexList = cmds.getAttr("target_Mesh.vrts", multiIndices = True)
-	for i in vtxTargetIndexList:
-		curPointPosition = cmds.xform("target_Mesh.pnts["+str(i)+"]", query=True,
-			translation=True, worldSpace=True)
-		vtxTargetPosition.append(curPointPosition)
-	# print type(vtxWorldPosition)
-	target_vertices = np.array(vtxTargetPosition)	
-	
-	# get coordinations in x, y, z
-	source_vertices_x = source_vertices[:,0]
-	source_vertices_y = source_vertices[:,1]
-	source_vertices_z = source_vertices[:,2]
+target_vertices_x = target_vertices[:,0]
+target_vertices_y = target_vertices[:,1]
+target_vertices_z = target_vertices[:,2]
 
-	# sampling
-	sample_vertices_x = np.array([])
-	sample_vertices_y = np.array([])
-	sample_vertices_z = np.array([])
-	vertex_num = source_vertices_x.size
-	for i in range(0,vertex_num):
-		if i%10==0:
-			sample_vertices_x = np.append(sample_vertices_x, source_vertices_x[i])
-			sample_vertices_y = np.append(sample_vertices_y, source_vertices_y[i])
-			sample_vertices_z = np.append(sample_vertices_z, source_vertices_z[i])
+#print(target_vertices_x.shape)
+#print(source_vertices_y.shape)
+#print(source_vertices_z.shape)
 
-	target_vertices_x = target_vertices[:,0]
-	target_vertices_y = target_vertices[:,1]
-	target_vertices_z = target_vertices[:,2]
+sample_vertices_x = np.array([])
+sample_vertices_y = np.array([])
+sample_vertices_z = np.array([])
 
-	fitting_func = rbf(sample_vertices_x, sample_vertices_y, sample_vertices_z)
-	generate_z = fitting_func(target_vertices_x, target_vertices_y)
-	result_vertices = np.dstack([target_vertices_x, target_vertices_y, generate_z])
+vertex_num = source_vertices_x.size
+for i in range(0,vertex_num):
+    if i%5==0:
+        sample_vertices_x = np.append(sample_vertices_x, source_vertices_x[i])
+        sample_vertices_y = np.append(sample_vertices_y, source_vertices_y[i])
+        sample_vertices_z = np.append(sample_vertices_z, source_vertices_z[i])
 
-	# mesh deformation on target.obj
+fitting_func = Rbf(sample_vertices_x, sample_vertices_y, sample_vertices_z)
+generate_z = fitting_func(target_vertices_x, target_vertices_y)
 
-	selection = OpenMaya.MSelectionList()
-	OpenMaya.MGlobal.getActiveSelectionList( selection )
-	iterSel = OpenMaya.MItSelectionList(selection, OpenMaya.MFn.kMesh)
+result_vertices = np.vstack([target_vertices_x, target_vertices_y, generate_z]).T
 
-	#while not iterSel.isDone():
-		# get dagPath
-		#dagPath = OpenMaya.MDagPath()
-		#iterSel.getDagPath( dagPath )
-		# create empty point array
-		#inMeshMPointArray = OpenMaya.MPointArray()
-		# create function set and get points in world space
-		#currentInMeshMFnMesh = OpenMaya.MFnMesh(dagPath)
-		#currentInMeshMFnMesh.getPoints(inMeshMPointArray, OpenMaya.MSpace.kWorld)
-		# put each point to a list
-		#pointList = []
-		#for i in range( inMeshMPointArray.length() ) :
-			#pointList.append( [inMeshMPointArray[i][0], inMeshMPointArray[i][1], inMeshMPointArray[i][2]] )
+#percentage = 0.0
 
+#for i in range(0,20574):
+#    percentage = percentage + (generate_z[i]-target_vertices_z[i])/target_vertices_z[i]
 
-	selection = None		
-	cmds.select("target_Mesh")
-	selection_list = OpenMaya.MSelectionList()
-	selection = cmds.duplicate(selection[0])[0]
-	cmds.select(selection)
-	selection_list.add(selection)
-	dag_path = selection_list.getDagPath(0)
+# print(percentage)
+pm.save_mesh_raw("output.obj", result_vertices, target_mesh.faces, voxels=None)
+#result_mesh = pm.meshio.form_mesh(result_vertices, target_mesh.faces, voxels=None)
+#pm.save_mesh("output.obj", result_mesh)
+print(target_vertices_x)
+print(target_vertices_y)
+print(generate_z)
+#print(target_vertices_x.shape)
+#print(target_vertices_y.shape)
+#print(generate_z.shape)
+#print(result_vertices.shape)
 
-	mfn_set = OpenMaya.MFnMesh(dag_path)
-	verts = mfn_set.getPoints(space=OpenMaya.MSpace.kObject)
-	new_points = OpenMaya.MPointArray()
-
-	i = 0
-
-	for v in verts:
-		v.x = result_vertices[i][0]
-		v.y = result_vertices[i][1]
-		v.z = result_vertices[i][2]
-		new_points.append(v)
-		i = i+1
-
-	mfn_set.setPoints(new_points, space=OpenMaya.MSpace.kWorld)
-
-	export_obj("mask_Mesh", dir+"output.obj")
-	sys.exit()
-
-def main():
-	deformation()
-
-
-if __name__ == "__main__":
-	main()
