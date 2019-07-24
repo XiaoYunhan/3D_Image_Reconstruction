@@ -5,7 +5,7 @@ from scipy.spatial.distance import cdist, pdist, squareform
 
 __all__ = ['RBF']
 
-class Rbf(object):
+class RBF(object):
 
 	def multiquadric(self, r):
 
@@ -27,7 +27,7 @@ class Rbf(object):
 		return r
 
 	def __init__(self, input_x, input_y, input_z):
-		
+        
 		self.x = input_x
 		self.y = input_y
 		self.z = input_z
@@ -50,6 +50,3 @@ class Rbf(object):
 		r = cdist(xa.T, self.flatten.T, 'euclidean')
 		return np.dot(self.thin_plate(r), self.B).reshape(sp)
 
-	# def perform(self):
-
-		# if isinstance(self.function, str)
