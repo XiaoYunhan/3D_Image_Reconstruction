@@ -3,13 +3,13 @@
 - [Project Objective](#Project-Obejctive)
 - [Development Environment & Library](#Development-Environment-&-Library)
 - [Building Compilation Environment](#Building-Compilation-Environment)
-- [Radial Basis Function Interpolation Algorithm](Radial-Basis-Function-Interpolation-Algorithm)
-  - [Radial Basis Function](Radial-Basis-Function:)
-  - [Interpolation](Interpolation:)
-  - [Implementation of RBF on Mesh Deformation](implementation-of-rbf-on-mesh-deformation:)
-- [Callable API](Callable-API)
-- [Error Analysis](Error-Analysis)
-- [Alternative Solution](Alternative-Solution)
+- [Radial Basis Function Interpolation Algorithm](#Radial-Basis-Function-Interpolation-Algorithm)
+  - [Radial Basis Function](#Radial-Basis-Function:)
+  - [Interpolation](#Interpolation:)
+  - [Implementation of RBF on Mesh Deformation](#implementation-of-rbf-on-mesh-deformation:)
+- [Callable API](#Callable-API)
+- [Error Analysis](#Error-Analysis)
+- [Alternative Solution](#Alternative-Solution)
 
 ---
 ### Project Objective
