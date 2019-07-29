@@ -53,7 +53,7 @@ target_vertices_y = target_vertices[:,1]
 target_vertices_z = target_vertices[:,2]
 
 control_num = 50
-control_index = np.arange(control_num)
+#control_index = np.arange(control_num)
 
 generate_x = np.array([])
 generate_y = np.array([])
