@@ -8,6 +8,8 @@
   - [Interpolation](#Interpolation)
   - [Implementation of RBF on Mesh Deformation](#implementation-of-rbf-on-mesh-deformation)
 - [Callable API](#Callable-API)
+  - [RBF](#RBF)
+  - [RBF_Deformation](#RBF-Deformation)
 - [Error Analysis](#Error-Analysis)
 - [Alternative Solution](#Alternative-Solution)
 
@@ -54,6 +56,16 @@ Firstly, we call pymesh.load_mesh() to load source.obj and target_source.obj. We
 Because faces arrays of two mesh are the same, the sequence of vertices are also the same. Then we can easily use the face array gotten from target or source mesh to form output mesh with pymesh.save_mesh_raw(vertices, faces, voxel = None).
 
 ### Callable API
+#### RBF
+RBF class is implemented to fitting a 4 dimensions data [[para1],[para2],[para3],[para4]]and predict the column data with a 3 dimensions data.  
+sample code is provided below.
+```python
+from RBF import RBF
+fitting_func = RBF(para1, para2, para3, para4)
+result = fitting_func(para5, para6, para7)
+# all parameters are <numpy.ndarray> and shape is (size,)
+````
+#### RBF_Deformation
 RBF mesh deformation is written in callable class and provided in `/API/` folder. After import **RBF_Deformation** module, we need to use target mesh, source mesh and number of control points to initialize the class. Then, we can assign a name to the output mesh .obj file.
 * `RBF_Deformation(directory_of_target_mesh, directory_of_source_mesh, num_control_points)`
 * `Object(name_of_output_mesh)`
