@@ -1,28 +1,32 @@
 # Radial Basis Function Mesh Deformation
 
-- [Project Objective](#Project-Obejctive)
-- [Development Environment & Library](#Development-Environment-&-Library)
-- [Building Compilation Environment](#Building-Compilation-Environment)
-- [Radial Basis Function Interpolation Algorithm](#Radial-Basis-Function-Interpolation-Algorithm)
-  - [Radial Basis Function](#Radial-Basis-Function)
-  - [Interpolation](#Interpolation)
-  - [Implementation of RBF on Mesh Deformation](#implementation-of-rbf-on-mesh-deformation)
-- [Callable API](#Callable-API)
-  - [RBF](#RBF)
-  - [RBF_Deformation](#RBF-Deformation)
-- [Error Analysis](#Error-Analysis)
-- [Alternative Solution](#Alternative-Solution)
+- [Radial Basis Function Mesh Deformation](#radial-basis-function-mesh-deformation)
+    - [Project Objective](#project-objective)
+    - [Development Environment & Library](#development-environment--library)
+    - [Building Compilation Environment](#building-compilation-environment)
+      - [Linux (Ubuntu 18.04 LTS)](#linux-ubuntu-1804-lts)
+      - [Windows](#windows)
+    - [Radial Basis Function Interpolation Algorithm](#radial-basis-function-interpolation-algorithm)
+      - [Radial Basis Function:](#radial-basis-function)
+      - [Interpolation:](#interpolation)
+      - [Implementation of RBF on Mesh Deformation:](#implementation-of-rbf-on-mesh-deformation)
+    - [Callable API](#callable-api)
+      - [RBF](#rbf)
+      - [RBF_Deformation](#rbfdeformation)
+    - [Error Analysis](#error-analysis)
+    - [Alternative Solution](#alternative-solution)
 
 ---
 ### Project Objective
 **Radial basis functions** (“RBFs”) are the most versatile and commonly used scattered data interpolation techniques. In this project, we have two mesh objects: **source.obj** and **target.obj**. We need to use RBF interpolation algorithm to fit coordination of vertices in **source.obj**. Using the RBF class we gotten, we need to do mesh deformation on the **target.obj** to get **output.obj** which should have quite similar looking compared to the original source mesh.
 
 ### Development Environment & Library
-* **Ubuntu 18.04 LTS** and above
+* **Ubuntu 18.04 LTS** and above / **Windows 7** and above
 * **Anaconda2** & **Spyder IDE** (Python 3.7)
 * **Numpy** & **Scipy** & **PyMesh** and its dependency libraries (**nose, Eigen, PyBind11**)
 
 ### Building Compilation Environment
+#### Linux (Ubuntu 18.04 LTS)
 1. Open terminal and type in `bash Anaconda2-xxxx.xx-Linux-x86_64.sh` to Install **Anaconda2 for Linux** (Python 2.7)
 2. `source ~/.bashrc`, `conda init` and `anaconda-navigator` to initialize conda and open anaconda GUI
 3. `conda create -n <env_name> python=2.7` to create another conda environment
@@ -33,31 +37,52 @@
 8. run script under directory of scripts and obj files
 9. `sudo apt-get install openctm-tools` and `ctmviewer output.obj` to install ctmviewer to view .obj files
 
+#### Windows
+1. Install **Python2** or **Python3**
+2. Install **Numpy** and **Scipy**, you can follow this [document](https://mukai-lab.org/library/mayanumpy/)
+3. Clone **Pymesh** from [GitHub](https://github.com/PyMesh/PyMesh.git), and follow its build & install instruction on [GitHub](https://github.com/PyMesh/PyMesh#build)
+4. `python example.py` to run the example script under `\API` folder.
+5. Double click `output.obj` to view .obj file.
+
 ### Radial Basis Function Interpolation Algorithm
 #### Radial Basis Function:
 A radial basis function is a real-valued function whose value depends only on the distance from the origin and the norm is usually Euclidean distance.
-Commonly used types of radial basis functions include:
-Gaussians: φ(r)=ⅇ^(-(εr)^2 )
-Multiquadric: φ(r)=√(1+(εr)^2 )
-Linear: φ(r)=r
-Cubic: φ(r)=r^3
-Thin plate spline: φ(r)=r^2 log(r)
-Inverse quadratic: φ(r)=1/(1+(εr)^2 )
-Inverse multiquadric: φ(r)=1/√(1+(εr)^2 )
-In this script, we use thin-plate spline function as kernel function.
+Commonly used types of radial basis functions include:  
+Gaussians: $\phi\left(r\right)=e^{(-\varepsilon r)^{2}}$  
+Multiquadric: $\phi\left(r\right)=\sqrt{1+(\varepsilon r)^{2}}$  
+Linear: $\phi\left(r\right)=r$  
+Cubic: $\phi\left(r\right)=r^{3}$  
+Thin plate spline: $\phi\left(r\right)=r^{2}\ln{r}$  
+Inverse quadratic: $\phi\left(r\right)=\frac{1}{1+(\varepsilon r)^{2}}$  
+Inverse multiquadric: $\phi\left(r\right)=\frac{1}{\sqrt{1+(\varepsilon r)^{2}}}$  
+In this script, we use **thin-plate spline function** as kernel function.
+
 #### Interpolation:
-Given a set of n distinct data points {x_j }_(j=1)^n and corresponding data values {f_j }_(J ̇=1)^n, RBF interpolant is given by s(x) = ∑_(j=1)^n▒〖λ_j ϕ(‖x-x_j ‖) 〗, where ϕ(r), r≥0, is some radial function. The expansion coefficients λ_j are determined from the interpolation conditions s(x_j )=f_j, j = 1, …, n, which leads to the following symmetric linear system:
-[A][λ]=[f], where the entries of A are given by a_(j,k)= ϕ(‖x-x_j ‖).
-For example, consider RBF estimation in two dimensions with an additional polynomial. A polynomial in one dimension is a + bx + cx^2 + …. Truncating after the linear term gives a +bx. A similar polynomial in two dimensions is of the form a + bx + cy. Adding this to the RBF synthesis equation gives f ̂(P)=∑_(k=1)^n▒〖c_k ϕ(‖P-P_k ‖ 〗)+c_(n+1)⋅1+c_(n+2)⋅x+c_(n+3) y
-Here p = (x, y) is an arbitrary 2D point and P_k are the training points.
+Given a set of n distinct data points $\{x_j\}_{j=1}^{n}$ and corresponding data values $\{f_j\}_
+{j=1}^{n}$, RBF interpolant is given by $s(x) = \sum_{i=1}^{n} \lambda_i\phi(\|\mathbf{x}-\mathbf{x_i}\|)$, where $x\in\mathbb{R}$, is some radial function. The expansion coefficients $λ_j$ are determined from the interpolation conditions $s(x_j )=f_j, j=1,\dots ,n$, which leads to the following symmetric linear system:
+$[A][λ]=[f]$.
+For example, consider RBF estimation in two dimensions with an additional polynomial. A polynomial in one dimension is $a+bx+cx^2+\dots$ Truncating after the linear term gives a +bx. A similar polynomial in two dimensions is of the form $a + bx + cy$. Adding this to the RBF synthesis equation gives  
+$$\hat{f}(\mathbf{p})=\sum_{k=1}^{n} c_k\phi(\|\mathbf{p}-\mathbf{p_k}\|)+c_{n+1}.1+c_{n+2}.x+c_{n+3}.y$$  
+Here $p = (x, y)$ is an arbitrary 2D point and P_k are the training points.
 
 #### Implementation of RBF on Mesh Deformation:
-Firstly, we call pymesh.load_mesh() to load source.obj and target_source.obj. We can get their vertices and faces in form of <numpy.ndarray shape(vertices_num, 3)> by calling .vertices and .faces. Then we choose small number of vertices as control points (50 vertices in the script). In source mesh, we calculate displacements between control points and rest points in x, y, x axis separately. For the two layers of loop (for i  in range(control_num, vertex_num): for j in range(0, control_num)), in each subloop, we calculate distance between each points from one control points and add it into an 1-d array, after that, we form a 2d array [[control_point_x], [control_point_y], [control_point_z], [displacement_x]] and use it to initialize RBF class rbfX, rbfY and rbfZ for displacement_X, displacement_Y, displacement_Z. Then we can bring target vertices (x, y, z) into rbfX, rbfY, rbfZ to calculate corresponding displacement. After that it is easy to get corresponding coordination of vertex. After all loops, we get a 3 1-d arrays of coordination.
-Because faces arrays of two mesh are the same, the sequence of vertices are also the same. Then we can easily use the face array gotten from target or source mesh to form output mesh with pymesh.save_mesh_raw(vertices, faces, voxel = None).
+Firstly, we call **pymesh.load_mesh()** to load source.obj and target_source.obj. We can get their vertices and faces in form of **<numpy.ndarray shape(vertices_num, 3)>** by calling **.vertices** and **.faces**. Then we choose small number of vertices as control points (50 vertices in the script). In source mesh, we calculate displacements between control points and rest points in x, y, x axis separately. For the two layers of loop 
+```python
+for i  in range(control_num, vertex_num): 
+    for j in range(0, control_num):
+```
+in each subloop, we calculate distance between each points from one control points and add it into an 1-d array, after that, we form a 2d array 
+$\left[
+\begin{matrix}
+[cp_x] & [cp_y] & [cp_z] & [displacement_i]\\
+\end{matrix}
+\right]$ (i = x, y, z) 
+and use it to initialize RBF class rbfX, rbfY and rbfZ for $displacement_X, displacement_Y, displacement_Z$. Then we can bring target vertices into $rbf_X, rbf_Y, rbf_Z$ to calculate corresponding displacement. After that it is easy to get corresponding coordination of vertex. After all loops, we get a 3 1-d arrays of coordination.
+Because faces arrays of two mesh are the same, the sequence of vertices are also the same. Then we can easily use the face array gotten from target or source mesh to form output mesh with **pymesh.save_mesh_raw(vertices, faces, voxel = None)**.
 
 ### Callable API
 #### RBF
-RBF class is implemented to fitting a 4 dimensions data [[para1],[para2],[para3],[para4]]and predict the column data with a 3 dimensions data.  
+RBF class is implemented to fitting a 4 dimensions data [[para1],[para2],[para3],[para4]]and predict the column data with a 3 dimensions data.
 sample code is provided below.
 ```python
 from RBF import RBF
