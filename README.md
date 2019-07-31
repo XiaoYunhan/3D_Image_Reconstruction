@@ -48,22 +48,21 @@
 #### Radial Basis Function:
 A radial basis function is a real-valued function whose value depends only on the distance from the origin and the norm is usually Euclidean distance.
 Commonly used types of radial basis functions include:  
-Gaussians: $\phi\left(r\right)=e^{(-\varepsilon r)^{2}}$  
-Multiquadric: $\phi\left(r\right)=\sqrt{1+(\varepsilon r)^{2}}$  
-Linear: $\phi\left(r\right)=r$  
-Cubic: $\phi\left(r\right)=r^{3}$  
-Thin plate spline: $\phi\left(r\right)=r^{2}\ln{r}$  
-Inverse quadratic: $\phi\left(r\right)=\frac{1}{1+(\varepsilon r)^{2}}$  
-Inverse multiquadric: $\phi\left(r\right)=\frac{1}{\sqrt{1+(\varepsilon r)^{2}}}$  
+Gaussians: ![equation](http://www.sciweavers.org/tex2img.php?eq=%24%5Cphi%5Cleft%28r%5Cright%29%3De%5E%7B%28-%5Cvarepsilon%20r%29%5E%7B2%7D%7D%24&bc=White&fc=Black&im=jpg&fs=12&ff=arev&edit=0)  
+Multiquadric: ![equation](http://www.sciweavers.org/tex2img.php?eq=%24%5Cphi%5Cleft%28r%5Cright%29%3D%5Csqrt%7B1%2B%28%5Cvarepsilon%20r%29%5E%7B2%7D%7D%24&bc=White&fc=Black&im=jpg&fs=12&ff=arev&edit=0)  
+Linear: ![equation](http://www.sciweavers.org/tex2img.php?eq=%24%5Cphi%5Cleft%28r%5Cright%29%3Dr%24&bc=White&fc=Black&im=jpg&fs=12&ff=arev&edit=0)  
+Cubic: ![equation](http://www.sciweavers.org/tex2img.php?eq=%24%5Cphi%5Cleft%28r%5Cright%29%3Dr%5E%7B3%7D%24&bc=White&fc=Black&im=jpg&fs=12&ff=arev&edit=0)  
+Thin plate spline: ![equation](http://www.sciweavers.org/tex2img.php?eq=%24%5Cphi%5Cleft%28r%5Cright%29%3Dr%5E%7B2%7D%5Cln%7Br%7D%24&bc=White&fc=Black&im=jpg&fs=12&ff=arev&edit=0)  
+Inverse quadratic: ![equation](http://www.sciweavers.org/tex2img.php?eq=%24%5Cphi%5Cleft%28r%5Cright%29%3D%5Cfrac%7B1%7D%7B1%2B%28%5Cvarepsilon%20r%29%5E%7B2%7D%7D%24&bc=White&fc=Black&im=jpg&fs=12&ff=arev&edit=0)  
+Inverse multiquadric: ![equation](http://www.sciweavers.org/tex2img.php?eq=%5Cphi%5Cleft%28r%5Cright%29%3D%5Cfrac%7B1%7D%7B%5Csqrt%7B1%2B%28%5Cvarepsilon%20r%29%5E%7B2%7D%7D%7D%24&bc=White&fc=Black&im=jpg&fs=12&ff=arev&edit=0)  
 In this script, we use **thin-plate spline function** as kernel function.
 
 #### Interpolation:
-Given a set of n distinct data points $\{x_j\}_{j=1}^{n}$ and corresponding data values $\{f_j\}_
-{j=1}^{n}$, RBF interpolant is given by $s(x) = \sum_{i=1}^{n} \lambda_i\phi(\|\mathbf{x}-\mathbf{x_i}\|)$, where $x\in\mathbb{R}$, is some radial function. The expansion coefficients $λ_j$ are determined from the interpolation conditions $s(x_j )=f_j, j=1,\dots ,n$, which leads to the following symmetric linear system:
-$[A][λ]=[f]$.
-For example, consider RBF estimation in two dimensions with an additional polynomial. A polynomial in one dimension is $a+bx+cx^2+\dots$ Truncating after the linear term gives a +bx. A similar polynomial in two dimensions is of the form $a + bx + cy$. Adding this to the RBF synthesis equation gives  
-$$\hat{f}(\mathbf{p})=\sum_{k=1}^{n} c_k\phi(\|\mathbf{p}-\mathbf{p_k}\|)+c_{n+1}.1+c_{n+2}.x+c_{n+3}.y$$  
-Here $p = (x, y)$ is an arbitrary 2D point and P_k are the training points.
+Given a set of n distinct data points ![equation](http://www.sciweavers.org/tex2img.php?eq=%24%5C%7Bx_j%5C%7D_%7Bj%3D1%7D%5E%7Bn%7D%24&bc=White&fc=Black&im=jpg&fs=12&ff=arev&edit=0) and corresponding data values ![equation](http://www.sciweavers.org/tex2img.php?eq=%24%5C%7Bf_j%5C%7D_%0A%7Bj%3D1%7D%5E%7Bn%7D%24&bc=White&fc=Black&im=jpg&fs=12&ff=arev&edit=0), RBF interpolant is given by ![equation](http://www.sciweavers.org/tex2img.php?eq=%24s%28x%29%20%3D%20%5Csum_%7Bi%3D1%7D%5E%7Bn%7D%20%5Clambda_i%5Cphi%28%5C%7C%5Cmathbf%7Bx%7D-%5Cmathbf%7Bx_i%7D%5C%7C%29%24&bc=White&fc=Black&im=jpg&fs=12&ff=arev&edit=0), where ![equation](http://www.sciweavers.org/tex2img.php?eq=%24x%5Cin%5Cmathbf%7BR%7D%24&bc=White&fc=Black&im=jpg&fs=12&ff=arev&edit=0), is some radial function. The expansion coefficients ![equation](http://www.sciweavers.org/tex2img.php?eq=%24%5Clambda%7B%CE%BB%7D_j%24&bc=White&fc=Black&im=jpg&fs=12&ff=arev&edit=0) are determined from the interpolation conditions ![equation](http://www.sciweavers.org/tex2img.php?eq=%24s%28x_j%20%29%3Df_j%2C%20j%3D1%2C%5Cdots%20%2Cn%24&bc=White&fc=Black&im=jpg&fs=12&ff=arev&edit=0), which leads to the following symmetric linear system:
+![equation](http://www.sciweavers.org/tex2img.php?eq=%24%5BA%5D%5B%5Clambda%5D%3D%5Bf%5D%24&bc=White&fc=Black&im=jpg&fs=12&ff=arev&edit=0).
+For example, consider RBF estimation in two dimensions with an additional polynomial. A polynomial in one dimension is ![equation](http://www.sciweavers.org/tex2img.php?eq=%24a%2Bbx%2Bcx%5E2%2B%5Cdots%24&bc=White&fc=Black&im=jpg&fs=12&ff=arev&edit=0) Truncating after the linear term gives a +bx. A similar polynomial in two dimensions is of the form ![equation](http://www.sciweavers.org/tex2img.php?eq=%24a%20%2B%20bx%20%2B%20cy%24&bc=White&fc=Black&im=jpg&fs=12&ff=arev&edit=0). Adding this to the RBF synthesis equation gives  
+![equation](http://www.sciweavers.org/tex2img.php?eq=%24%24%5Chat%7Bf%7D%28%5Cmathbf%7Bp%7D%29%3D%5Csum_%7Bk%3D1%7D%5E%7Bn%7D%20c_k%5Cphi%28%5C%7C%5Cmathbf%7Bp%7D-%5Cmathbf%7Bp_k%7D%5C%7C%29%2Bc_%7Bn%2B1%7D.1%2Bc_%7Bn%2B2%7D.x%2Bc_%7Bn%2B3%7D.y%24%24%20&bc=White&fc=Black&im=jpg&fs=12&ff=arev&edit=0)  
+Here ![equation](http://www.sciweavers.org/tex2img.php?eq=%24p%20%3D%20%28x%2C%20y%29%24&bc=White&fc=Black&im=jpg&fs=12&ff=arev&edit=0) is an arbitrary 2D point and P_k are the training points.
 
 #### Implementation of RBF on Mesh Deformation:
 Firstly, we call **pymesh.load_mesh()** to load source.obj and target_source.obj. We can get their vertices and faces in form of **<numpy.ndarray shape(vertices_num, 3)>** by calling **.vertices** and **.faces**. Then we choose small number of vertices as control points (50 vertices in the script). In source mesh, we calculate displacements between control points and rest points in x, y, x axis separately. For the two layers of loop 
@@ -72,12 +71,8 @@ for i  in range(control_num, vertex_num):
     for j in range(0, control_num):
 ```
 in each subloop, we calculate distance between each points from one control points and add it into an 1-d array, after that, we form a 2d array 
-$\left[
-\begin{matrix}
-[cp_x] & [cp_y] & [cp_z] & [displacement_i]\\
-\end{matrix}
-\right]$ (i = x, y, z) 
-and use it to initialize RBF class rbfX, rbfY and rbfZ for $displacement_X, displacement_Y, displacement_Z$. Then we can bring target vertices into $rbf_X, rbf_Y, rbf_Z$ to calculate corresponding displacement. After that it is easy to get corresponding coordination of vertex. After all loops, we get a 3 1-d arrays of coordination.
+![equation](http://www.sciweavers.org/tex2img.php?eq=%20%5Cbegin%7Bbmatrix%7D%5Bcp_x%5D%20%26%20%5Bcp_y%5D%20%26%20%5Bcp_z%5D%20%26%20%5Bdisp_i%5D%20%5Cend%7Bbmatrix%7D%20&bc=White&fc=Black&im=jpg&fs=12&ff=arev&edit=0)  
+and use it to initialize RBF class rbfX, rbfY and rbfZ for ![equation](http://www.sciweavers.org/tex2img.php?eq=%24displacement_X%2C%20displacement_Y%2C%20displacement_Z%24&bc=White&fc=Black&im=jpg&fs=12&ff=arev&edit=0). Then we can bring target vertices into ![equation](http://www.sciweavers.org/tex2img.php?eq=%24rbf_X%2C%20rbf_Y%2C%20rbf_Z%24&bc=White&fc=Black&im=jpg&fs=12&ff=arev&edit=0) to calculate corresponding displacement. After that it is easy to get corresponding coordination of vertex. After all loops, we get a 3 1-d arrays of coordination.
 Because faces arrays of two mesh are the same, the sequence of vertices are also the same. Then we can easily use the face array gotten from target or source mesh to form output mesh with **pymesh.save_mesh_raw(vertices, faces, voxel = None)**.
 
 ### Callable API
